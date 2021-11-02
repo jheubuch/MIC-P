@@ -25,10 +25,15 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD;           //CODE 1
     sysInit();
                                         //CODE 2
+    P5DIR = ~(BIT5 | BIT6);
+    P5REN = (BIT5 | BIT6);
+    P5OUT = (BIT5 | BIT6);
 
                                         //CODE 3
 
                                         //CODE 4
+    P1DIR = ~0;
+    P1OUT = 0;
 
     PM5CTL0 &= ~LOCKLPM5;               //Enable digital IO
 
@@ -41,6 +46,7 @@ int main(void)
                                         //CODE 7
 
                                         //CODE 8
+
 
                                         //CODE 9
 
