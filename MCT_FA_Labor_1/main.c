@@ -110,6 +110,39 @@ void initPort5b(void){
      P5OUT = PORTPINb6_H;       //Port 5 output pins 7,5,4,3,2,1,0 -> low. Input pin 6 -> set internal resistor to pull up mode.
 }
 
+void ledRedWhenS1CODE1() {
+    if(P5IN & (PORTPINa1 << PORTPINa6)) {
+            // Bit gesetzt (Taster nicht gedrückt)
+            P1OUT &= ~PORTPINa1;
+        }
+    else {
+        // Bit nicht gesetzt (Taster gedrückt)
+        P1OUT |= PORTPINa1;
+    }
+}
+
+void ledRedWhenS1CODE3() {
+    if(P5IN & PORTPINb6_H) {
+        // Bit gesetzt (Taster nicht gedrückt)
+        P1OUT &= ~PORTPINb0_H;
+        }
+    else {
+        // Bit nicht gesetzt (Taster gedrückt)
+        P1OUT |= PORTPINb0_H;
+    }
+}
+
+void ledGreenWhenS1CODE3() {
+    if(P5IN & PORTPINb6_H) {
+        // Bit gesetzt (Taster nicht gedrückt)
+        P1OUT &= ~PORTPINb1_H;
+        }
+    else {
+        // Bit nicht gesetzt (Taster gedrückt)
+        P1OUT |= PORTPINb1_H;
+    }
+}
+
 
 int main(void)
 {
@@ -131,10 +164,14 @@ int main(void)
 	while(1) {                  //run until switched off
 
     //CODE5
-
+    ledRedWhenS1CODE3();
+    //ledGreenWhenS1CODE3();
 
 
 	}
 }
+
+// RAM Address range
+// 0x002BFF - 0x001C00
 
 

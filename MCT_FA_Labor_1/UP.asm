@@ -18,9 +18,9 @@ var2   .byte 0xA
 
 UP:    mov.w #0x1C00, R6
 
-	   mov.b &0x1C00, R5    ;CODE6
+	   mov.b &0x1C00, R5    ;CODE6 Move Byte
        mov 0(R6), R5		;CODE7
-       movx.a 0(R6),R5		;CODE8
+       movx.a 0(R6),R5		;CODE8	.a => 20 Bit Zahl, von der Angegebenen Adresse beginnend
        mov.b @R6+, R5		;CODE9
        mov.b @R6, R5		;CODE10
        movx  var1, R5       ;CODE11
