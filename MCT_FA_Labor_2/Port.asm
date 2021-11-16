@@ -17,6 +17,8 @@
 
 			                            ;ASM CODE 1
 
+            .sect ".text:_isr"
+
 
 PORT5_ISR:  addx.a P5IV, PC             ;ASM CODE 2
 		    jmp	default_HND						;0x0    -> none
@@ -39,6 +41,8 @@ default_HND: reti                    ;ASM CODE 3
 
 
 		                             ;ASM CODE 4
+ .sect PORT5_VECTOR
+ .short PORT5_ISR
 
 
 
