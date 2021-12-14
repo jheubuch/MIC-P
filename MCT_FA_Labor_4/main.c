@@ -36,6 +36,9 @@ int main(void)
     //##################### C O D E  2 ##########################################
 
                                         //Config P1.0 for OUTn
+    P1DIR |= BIT0;              // > output
+    P1SEL1 &= ~BIT0;            // 1. alternative onchip-modul-funktion
+    P1SEL0 |= BIT0;
 
 
 
@@ -43,12 +46,34 @@ int main(void)
 
 
                                         //Config CCn for OUTn
+    TA0CCTL1 = 0x00;            // initialisierung
+
+    // set out mode to toggle
+    TA0CCTL1 |= OUTMOD_4;       // capture compare einheit auf toggle setzen
+
+
+
 
                                         //Config TA0
 
+    // Clear timer
+    TA0CTL |= TACLR;
+    // Enable Stop mode
+    TA0CTL &= ~MC;
+    TA0CTL |= MC__STOP;
+
+    // Select SMCLK source
+    TA0CTL |= TASSEL__SMCLK;
+    // set SMCLK divider
+    TA0CTL |= ID__8;
+    TA0EX0 |= TAIDEX__8;
+
                                         //Config CC0
+    TA0CCR0 = 62500;                    // 0.5s timer
 
                                         //Start TA0
+    // Enable up mode
+    TA0CTL |= MC__UP;
 
     while(1){
 
