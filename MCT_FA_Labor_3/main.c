@@ -21,6 +21,21 @@ void sysInit(void) {
 }
 
 
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void TA0_CC0_ISR(void) {
+//    if (P1OUT & BIT0) {
+//        // LED IST AN
+//        P1OUT &= ~BIT0;
+//    } else {
+//        // LED IST AUS
+//        P1OUT |= BIT0;
+//    }
+
+    P1OUT ^= BIT0;
+    CNT++;                              // CODE 6
+    if (CNT == 0x1000F) CNT = 0xFFF0;   // CODE 7
+}
+
 
 int main(void)
 {
@@ -40,7 +55,7 @@ int main(void)
     PM5CTL0 &= ~LOCKLPM5;
 
                                         //Set SMCLK divider
-    TA0CTL = 0b11000000;
+    TA0CTL |= 0b11000000;
     TA0EX0 |= 0b111;
 
 
@@ -48,28 +63,38 @@ int main(void)
     //##################### C O D E  1 ##########################################
 
                                         //Set 0.5 s interval CC0
-    TA0CCR0 = 62500;
+    TA0CCR0 = 999; //62500
                                         //Config CC0 for ISR
-    TA0CCTL0 |= 0b1000;
+    TA0CCTL0 |= 0b10000;
                                         //Config TA0
+    // Clear timer
     TA0CTL |= 0b100;
-    TA0CTL |= 0b100010000;
+    // Enable Stop mode
+    TA0CTL &= 0b1111111111001111;
+    // Select SMCLK source
+    TA0CTL |= 0b1000000000;
+    // Enable interrupts TAIFG
+    // TA0CTL |= 0b10;
 
 
                                         //Start TA0
+    // Enable up mode
+    TA0CTL |= 0b010000;
+
 
                                         //Enable global interrupts
+    __enable_interrupt();
 
     //##################### C O D E  2 ##########################################
     //##################### C O D E  3 ##########################################
 
     while(1){
-                                        //Blink LED1
-//        P1OUT |= 1;
-//        __delay_cycles(4000000);
-//        P1OUT &= ~1;
-//        __delay_cycles(4000000);
-                                        //CODE 4
+//                                        //Blink LED1
+////        P1OUT |= 1;
+////        __delay_cycles(4000000);
+////        P1OUT &= ~1;
+////        __delay_cycles(4000000);
+//                                        //CODE 4
         if(!(P5IN & 0b01000000)) {
             P1OUT |= 0b10;
         }
