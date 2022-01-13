@@ -12,6 +12,18 @@
 
 volatile uint16_t AD1, AD2;
 
+#pragma vector = ADC12_B_VECTOR
+__interrupt void ADC_isr(void) {
+
+    switch (ADC12IV) {
+        // ADC12MEM1
+        case ADC12IV_14:
+            AD1 = ADC12MEM0;
+            AD2 = ADC12MEM1;
+            break;
+    }
+
+}
 
 int main(void)
 {
@@ -29,6 +41,7 @@ int main(void)
     ADC12MCTL0 = ADC12DIF_0;            // single-ended mode
     ADC12MCTL0 |= ADC12VRSEL_0;         // add AVCC and AVSS as sources
     ADC12MCTL0 |= ADC12INCH_2;          // input channel 2
+
     ADC12MCTL1 = ADC12DIF_0;            // single-ended mode
     ADC12MCTL1 |= ADC12VRSEL_0;         // add AVCC and AVSS as sources
     ADC12MCTL1 |= ADC12EOS_1;           // set end of sequence
@@ -53,11 +66,50 @@ int main(void)
 
     ADC12CTL0 |= (ADC12ENC_1 | ADC12SC_1); // start conversion
 
+    ADC12IER0 = ADC12IE1;               // Enable Interrupt for MEM1 (ADC12IFG1 bit)
+    __enable_interrupt();
+
+// PWM
+
+    // Config TA0
+    // Clear timer
+    TA0CTL = TACLR;
+    // Enable Stop mode
+    TA0CTL &= ~MC;
+    TA0CTL |= MC__STOP;
+
+    // Select SMCLK source
+    TA0CTL |= TASSEL__SMCLK;
+    // set SMCLK divider
+    TA0CTL |= ID__1;
+
+    // Config CC
+    TA0CCR0 = 255 -1;                   // Periodendauer (Zählwert bis Reset)
+    TA0CCR1 = 255;                      // 255 compare value (init)
+    TA0CCR2 = 255;                      // 255 compare value (init)
+
+    TA0CCTL1 = 0x00;
+    TA0CCTL1 |= OUTMOD_7;               // capture compare einheit auf reset/set setzen
+    TA0CCTL1 |= CAP__COMPARE;           // compare modus
+    TA0CCTL1 |= CCIE_0;                 // disable interrupt for now
+
+    TA0CCTL2 = 0x00;
+    TA0CCTL2 |= OUTMOD_7;               // capture compare einheit auf reset/set setzen
+    TA0CCTL2 |= CAP__COMPARE;           // compare modus
+    TA0CCTL2 |= CCIE_0;                 // disable interrupt for now
+
+    P1DIR |= BIT0 | BIT1;              // > output
+    P1SEL1 &= ~BIT0 & ~BIT1;            // 1. alternative onchip-modul-funktion
+    P1SEL0 |= BIT0 | BIT1;
+
+    //Start TA0
+    // Enable up mode
+    TA0CTL |= MC__UP;
 
 
     while(1){
-        AD1 = ADC12MEM0;
-        AD2 = ADC12MEM1;
+        TA0CCR1 = AD1;                     // set compare value to AD value
+        TA0CCR2 = AD2;                     // set compare value to AD value
     };
 
 }
